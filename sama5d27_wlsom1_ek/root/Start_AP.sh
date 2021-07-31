@@ -17,6 +17,8 @@ echo " #     # #          #     # #      #    # #    #   "
 echo " #     # #          ######  ###### #    #  ####    "
 echo "---------------------------------------------------"
 
+modprobe -r wilc-sdio
+
 if lsmod | grep -q "wilc_sdio" ; then
 	echo "1.############## WILC-SDIO module is available ##############"
 else
@@ -40,6 +42,7 @@ else
 fi
 
 echo "3.############## Starting the Host AP deamon ##############" 
+killall hostapd
 hostapd /etc/wilc_hostapd_open.conf -B &
 if ps | grep -q "hostapd" ; 
 then
@@ -56,14 +59,14 @@ default-lease-time 3600;
 max-lease-time 7200;
 authoritative;
 
-subnet 192.168.1.0 netmask 255.255.255.0 {
-        range   192.168.1.10   192.168.1.100;
+subnet 192.168.0.0 netmask 255.255.255.0 {
+        range   192.168.0.10   192.168.0.100;
 }
 EOT
 fi
 
-echo "4.############## Configuring the AP IP Address to 192.168.1.1 ##############"
-ifconfig wlan0 192.168.1.1 
+echo "4.############## Configuring the AP IP Address to 192.168.0.1 ##############"
+ifconfig wlan0 192.168.0.1 
 echo "5. ############## Configuring the NGINX Webserver ##############"
 killall nginx
 sed -i "s/\broot\b.*/root \/usr\/share\/nginx\/html;/g" /etc/nginx/sites-available/default_server
